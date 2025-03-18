@@ -68,5 +68,5 @@ m, n, pivo, matriz = ler_arquivo("entrada.txt")
 # for linha in matriz:
 #    print(linha)
 
-largura, altura = aplicar_filtro("choboco.jpg", m, n, pivo, matriz)
+aplicar_filtro("choboco.jpg", m, n, pivo, matriz)
 
