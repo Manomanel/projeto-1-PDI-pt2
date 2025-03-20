@@ -41,14 +41,18 @@ def aplicar_filtro(caminho, m, n, pivo, offset, passoP, matriz):
    
    pivo_x, pivo_y = pivo
    
-   count = 0 #count para o passo P
+   count_x = -1 #count para o passo P
+   count_y = -1 
    
    #fors para andar pela imagem
    for y in range(pivo_y - 1, altura - pivo_y + 1): #calculo com o pivo para nao usar extensao por 0
+      count_y += 1
+      if (count_y % passoP != 0): continue #passo P
+      
       for x in range(pivo_x - 1, largura - pivo_x + 1): #aka nao aplicar o filtro nas bordas da img
          
-         count += 1
-         if (count % passoP != 0): continue #decidir se o pixel esta incluso no passo P ou nao 
+         count_x += 1
+         if (count_x % passoP != 0): continue #decidir se o pixel esta incluso no passo P ou nao 
          
          red = 0
          green = 0
@@ -87,6 +91,40 @@ def aplicar_filtro(caminho, m, n, pivo, offset, passoP, matriz):
          pixels[x, y] = (red, green, blue)#atribui o novo valor para o pixel atual
          
    img.save("imagem_filtrada2.jpg")#salva a nova imagem com nome diferente
+   
+   img_pos_hist = exp_histograma(img, largura, altura)
+    
+   img_pos_hist.save("imagem_histograma2.jpg")#salva a nova imagem da expansao de histograma com nome diferente
+
+def exp_histograma(imagem, largura, altura):
+   pixels = imagem.load()
+   high_R = 0              #valores iniciais
+   high_G = 0
+   high_B = 0
+   low_R = 255
+   low_G = 255
+   low_B = 255
+   
+   for y in range(altura): #analisar qual o menor valor de cada cor para o calculo a expansao
+      for x in range(largura):
+         r, g, b = pixels[x, y]
+         if(r < low_R): low_R = r
+         if(g < low_G): low_G = g
+         if(b < low_B): low_B = b
+         if(r > high_R): high_R = r
+         if(g > high_G): high_G = g
+         if(b > high_B): high_B = b
+
+
+   for y in range(altura): # passa de pixel em pixel usando os valores adquiridos
+      for x in range(largura):
+         r, g, b = pixels[x, y]
+         new_R = round((r - low_R) / (high_R - low_R) * 255) #o calculo do histograma e ja atribui o novo valor
+         new_G = round((g - low_G) / (high_G - low_G) * 255)
+         new_B = round((b - low_B) / (high_B - low_B) * 255)
+         pixels[x, y] = (new_R, new_G, new_B) #atribui o novo valor para o pixel atual
+   
+   return imagem
 
 # Exemplo de uso:
 m, n, pivo, offset, passoP, matriz = ler_arquivo("entrada2.txt")
@@ -97,4 +135,4 @@ m, n, pivo, offset, passoP, matriz = ler_arquivo("entrada2.txt")
 # for linha in matriz:
 #    print(linha)
 
-aplicar_filtro("choboco.jpg", m, n, pivo, offset, passoP, matriz)
+aplicar_filtro("images.png", m, n, pivo, offset, passoP, matriz)

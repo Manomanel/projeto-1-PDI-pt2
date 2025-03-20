@@ -46,7 +46,7 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
             for i in range(1, m+1):
                dist_altura = -pivo_x + i#distancia do pivo, pois o pixel atual e x e y
                dist_largura = -pivo_y + j#a distancia e baseada em x e y
-               r, g, b = pixels[x + dist_largura, y + dist_altura] #
+               r, g, b = pixels[x + dist_largura, y + dist_altura] # recebe os valores RGB do pixel
                red = red + (r * matriz[i-1][j-1])# valor_R_no_pixel_selecionado * valor da matriz de entrada
                green = green + (g * matriz[i-1][j-1])
                blue = blue + (b * matriz[i-1][j-1])
@@ -57,8 +57,41 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
          blue = round(blue/matrix_sum)
          pixels[x, y] = (red, green, blue)#atribui o novo valor para o pixel atual
          
-               
    img.save("imagem_filtrada.jpg")#salva a nova imagem com nome diferente
+   
+   img_pos_hist = exp_histograma(img, largura, altura)
+    
+   img_pos_hist.save("imagem_histograma.jpg")#salva a nova imagem da expansao de histograma com nome diferente
+
+def exp_histograma(imagem, largura, altura):
+   pixels = imagem.load()
+   high_R = 0              #valores iniciais
+   high_G = 0
+   high_B = 0
+   low_R = 255
+   low_G = 255
+   low_B = 255
+   
+   for y in range(altura): #analisar qual o menor valor de cada cor para o calculo a expansao
+      for x in range(largura):
+         r, g, b = pixels[x, y]
+         if(r < low_R): low_R = r
+         if(g < low_G): low_G = g
+         if(b < low_B): low_B = b
+         if(r > high_R): high_R = r
+         if(g > high_G): high_G = g
+         if(b > high_B): high_B = b
+
+
+   for y in range(altura): # passa de pixel em pixel usando os valores adquiridos
+      for x in range(largura):
+         r, g, b = pixels[x, y]
+         new_R = round((r - low_R) / (high_R - low_R) * 255) #o calculo do histograma e ja atribui o novo valor
+         new_G = round((g - low_G) / (high_G - low_G) * 255)
+         new_B = round((b - low_B) / (high_B - low_B) * 255)
+         pixels[x, y] = (new_R, new_G, new_B) #atribui o novo valor para o pixel atual
+   
+   return imagem
 
 # Exemplo de uso:
 m, n, pivo, matriz = ler_arquivo("entrada.txt")
@@ -68,5 +101,5 @@ m, n, pivo, matriz = ler_arquivo("entrada.txt")
 # for linha in matriz:
 #    print(linha)
 
-aplicar_filtro("choboco.jpg", m, n, pivo, matriz)
+aplicar_filtro("imagem_filtrada2.jpg", m, n, pivo, matriz)
 
