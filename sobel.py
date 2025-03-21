@@ -1,11 +1,9 @@
 from PIL import Image
+from decimal import Decimal, getcontext
 
 #LEITOR DE ARQUIVOS
 #int int (largura altura da matriz)
 #int int (o lugar em que um pivo será)
-#int (offset)
-#int (passo P)
-#int (Relu)
 #float float float (matriz)
 #float float float
 #float float float
@@ -20,21 +18,17 @@ def ler_arquivo(caminho):
    # Lendo a posição do pivô
    pivo_x, pivo_y = map(int, linhas[1].split())
    
-   # Lendo as novas variáveis do segundo passo do trabalho
-   offset = int(linhas[2].strip())
-   passoP = int(linhas[3].strip())
-   
    # Lendo a matriz
    matriz = []
-   for i in range(4, 4 + m):
+   for i in range(2, 2 + m):
       linha = list(map(float, linhas[i].split()))
       matriz.append(linha)
    
    #TODO detecção de erros de escrita no arquivo de entrada
    
-   return m, n, (pivo_x, pivo_y), offset, passoP, matriz
+   return m, n, (pivo_x, pivo_y), matriz
 
-def aplicar_filtro(caminho, m, n, pivo, offset, passoP, matriz):
+def aplicar_filtro(caminho, m, n, pivo, matriz):
    img = Image.open(caminho) #carrega a imagem e recebe informações
    largura, altura = img.size
    pixels = img.load()
@@ -42,61 +36,38 @@ def aplicar_filtro(caminho, m, n, pivo, offset, passoP, matriz):
    pixels2 = img2.load()
    
    pivo_x, pivo_y = pivo
-   
-   count_x = -1 #count para o passo P
-   count_y = -1 
+   matrix_size = m * n
+   count = 0
    
    #fors para andar pela imagem
    for y in range(pivo_y - 1, altura - pivo_y + 1): #calculo com o pivo para nao usar extensao por 0
-      count_y += 1
-      if (count_y % passoP != 0): continue #passo P
-      
       for x in range(pivo_x - 1, largura - pivo_x + 1): #aka nao aplicar o filtro nas bordas da img
-         
-         count_x += 1
-         if (count_x % passoP != 0): continue #decidir se o pixel esta incluso no passo P ou nao 
-         
-         red = 0
-         green = 0
-         blue = 0
+         red = Decimal(0)
+         green = Decimal(0)
+         blue = Decimal(0)
          matrix_sum = 0 # num filtro gaussiano, este valor será 1 pois quem vai ser dividido são os valores individuais
                         # caso seja um filtro com pesos inteiros no final vai dividir pela soma desses pesos
          for j in range(1, n+1):#altura e largura da matriz para percorrer
             for i in range(1, m+1):
                dist_altura = -pivo_x + i#distancia do pivo, pois o pixel atual e x e y
                dist_largura = -pivo_y + j#a distancia e baseada em x e y
-               r, g, b = pixels[x + dist_largura, y + dist_altura] #
-               red = red + (r * matriz[i-1][j-1])# valor_R_no_pixel_selecionado * valor da matriz de entrada
-               green = green + (g * matriz[i-1][j-1])
-               blue = blue + (b * matriz[i-1][j-1])
+               r, g, b = pixels[x + dist_largura, y + dist_altura] # recebe os valores RGB do pixel
+               red = red + Decimal(r * matriz[i-1][j-1] / matrix_size)# valor_R_no_pixel_selecionado * valor da matriz de entrada
+               green = green + Decimal(g * matriz[i-1][j-1] / matrix_size)
+               blue = blue + Decimal(b * matriz[i-1][j-1] / matrix_size)
                matrix_sum = matrix_sum + matriz[i-1][j-1]# adicionar os valores da matriz conforme passa para dividr dps
-               
-         red = round(red/matrix_sum)#calcular o valor final das cores
-         green = round(green/matrix_sum)#arredondar para virar int
-         blue = round(blue/matrix_sum)
          
-         #Calcular offset
-         red = red + offset
-         green = green + offset
-         blue = blue + offset
-         
-         #previnir que seja maior que 255
-         if(red > 255): red = 255
-         if(green > 255): green = 255
-         if(blue > 255): blue = 255
-         
-         #funcao ReLU
-         if(red < 0): red = 0
-         if(green < 0): green = 0
-         if(blue < 0): blue = 0
-         
+         red = round(red)#calcular o valor final das cores
+         green = round(green)#arredondar para virar int
+         blue = round(blue)
          pixels2[x, y] = (red, green, blue)#atribui o novo valor para o pixel atual
+         count += 1
          
-   img2.save("imagem_filtrada2.jpg")#salva a nova imagem com nome diferente
+   img2.save("imagem_filtrada.jpg")#salva a nova imagem com nome diferente
    
    img_pos_hist = exp_histograma(img2, largura, altura)
     
-   img_pos_hist.save("imagem_histograma2.jpg")#salva a nova imagem da expansao de histograma com nome diferente
+   img_pos_hist.save("imagem_histograma.jpg")#salva a nova imagem da expansao de histograma com nome diferente
 
 def exp_histograma(imagem, largura, altura):
    pixels = imagem.load()
@@ -129,12 +100,14 @@ def exp_histograma(imagem, largura, altura):
    return imagem
 
 # Exemplo de uso:
-m, n, pivo, offset, passoP, matriz = ler_arquivo("entrada2.txt")
+m, n, pivo, matriz = ler_arquivo("entrada.txt")
 # print("Dimensões:", m, "x", n)
 # print("Pivô em:", pivo)
-# print("Variáveis adicionais:", var1, var2, var3)
 # print("Matriz:")
 # for linha in matriz:
 #    print(linha)
 
-aplicar_filtro("images.png", m, n, pivo, offset, passoP, matriz)
+getcontext().prec = 50  # Aumenta a precisão
+
+aplicar_filtro("choboco.jpg", m, n, pivo, matriz)
+

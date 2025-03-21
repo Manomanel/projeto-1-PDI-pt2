@@ -31,6 +31,8 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
    img = Image.open(caminho) #carrega a imagem e recebe informações
    largura, altura = img.size
    pixels = img.load()
+   img2 = img.copy()
+   pixels2 = img2.load()
    
    pivo_x, pivo_y = pivo
    
@@ -51,15 +53,15 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
                green = green + (g * matriz[i-1][j-1])
                blue = blue + (b * matriz[i-1][j-1])
                matrix_sum = matrix_sum + matriz[i-1][j-1]# adicionar os valores da matriz conforme passa para dividr dps
-               
+         
          red = round(red/matrix_sum)#calcular o valor final das cores
          green = round(green/matrix_sum)#arredondar para virar int
          blue = round(blue/matrix_sum)
-         pixels[x, y] = (red, green, blue)#atribui o novo valor para o pixel atual
+         pixels2[x, y] = (red, green, blue)#atribui o novo valor para o pixel atual
          
-   img.save("imagem_filtrada.jpg")#salva a nova imagem com nome diferente
+   img2.save("imagem_filtrada.jpg")#salva a nova imagem com nome diferente
    
-   img_pos_hist = exp_histograma(img, largura, altura)
+   img_pos_hist = exp_histograma(img2, largura, altura)
     
    img_pos_hist.save("imagem_histograma.jpg")#salva a nova imagem da expansao de histograma com nome diferente
 
@@ -101,5 +103,5 @@ m, n, pivo, matriz = ler_arquivo("entrada.txt")
 # for linha in matriz:
 #    print(linha)
 
-aplicar_filtro("imagem_filtrada2.jpg", m, n, pivo, matriz)
+aplicar_filtro("choboco.jpg", m, n, pivo, matriz)
 
