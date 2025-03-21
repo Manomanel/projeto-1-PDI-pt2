@@ -37,8 +37,8 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
    pivo_x, pivo_y = pivo
    
    #fors para andar pela imagem
-   for y in range(pivo_y - 1, altura - pivo_y + 1): #calculo com o pivo para nao usar extensao por 0
-      for x in range(pivo_x - 1, largura - pivo_x + 1): #aka nao aplicar o filtro nas bordas da img
+   for y in range(pivo_y - 1, altura - m + pivo_y): #calculo com o pivo para nao usar extensao por 0
+      for x in range(pivo_x - 1, largura - n + pivo_x): #aka nao aplicar o filtro nas bordas da img
          red = 0
          green = 0
          blue = 0

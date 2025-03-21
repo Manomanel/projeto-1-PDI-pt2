@@ -40,8 +40,8 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
    count = 0
    
    #fors para andar pela imagem
-   for y in range(pivo_y - 1, altura - pivo_y + 1): #calculo com o pivo para nao usar extensao por 0
-      for x in range(pivo_x - 1, largura - pivo_x + 1): #aka nao aplicar o filtro nas bordas da img
+   for y in range(pivo_y - 1, altura - m + pivo_y): #calculo com o pivo para nao usar extensao por 0
+      for x in range(pivo_x - 1, largura - n + pivo_x): #aka nao aplicar o filtro nas bordas da img
          red = Decimal(0)
          green = Decimal(0)
          blue = Decimal(0)
@@ -51,7 +51,7 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
             for i in range(1, m+1):
                dist_altura = -pivo_x + i#distancia do pivo, pois o pixel atual e x e y
                dist_largura = -pivo_y + j#a distancia e baseada em x e y
-               r, g, b = pixels[x + dist_largura, y + dist_altura] # recebe os valores RGB do pixel
+               r, g, b = pixels[x + dist_largura - 1, y + dist_altura] # recebe os valores RGB do pixel
                red = red + Decimal(r * matriz[i-1][j-1] / matrix_size)# valor_R_no_pixel_selecionado * valor da matriz de entrada
                green = green + Decimal(g * matriz[i-1][j-1] / matrix_size)
                blue = blue + Decimal(b * matriz[i-1][j-1] / matrix_size)
@@ -61,13 +61,12 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
          green = round(green)#arredondar para virar int
          blue = round(blue)
          pixels2[x, y] = (red, green, blue)#atribui o novo valor para o pixel atual
-         count += 1
          
    img2.save("imagem_filtrada.jpg")#salva a nova imagem com nome diferente
    
-   img_pos_hist = exp_histograma(img2, largura, altura)
+   #img_pos_hist = exp_histograma(img2, largura, altura)
     
-   img_pos_hist.save("imagem_histograma.jpg")#salva a nova imagem da expansao de histograma com nome diferente
+   #img_pos_hist.save("imagem_histograma.jpg")#salva a nova imagem da expansao de histograma com nome diferente
 
 def exp_histograma(imagem, largura, altura):
    pixels = imagem.load()

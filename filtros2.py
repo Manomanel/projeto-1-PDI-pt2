@@ -47,12 +47,11 @@ def aplicar_filtro(caminho, m, n, pivo, offset, passoP, matriz):
    count_y = -1 
    
    #fors para andar pela imagem
-   for y in range(pivo_y - 1, altura - pivo_y + 1): #calculo com o pivo para nao usar extensao por 0
+   for y in range(pivo_y - 1, altura - m + pivo_y): #calculo com o pivo para nao usar extensao por 0
       count_y += 1
       if (count_y % passoP != 0): continue #passo P
       
-      for x in range(pivo_x - 1, largura - pivo_x + 1): #aka nao aplicar o filtro nas bordas da img
-         
+      for x in range(pivo_x - 1, largura - n + pivo_x): #aka nao aplicar o filtro nas bordas da img
          count_x += 1
          if (count_x % passoP != 0): continue #decidir se o pixel esta incluso no passo P ou nao 
          
@@ -94,10 +93,11 @@ def aplicar_filtro(caminho, m, n, pivo, offset, passoP, matriz):
          
    img2.save("imagem_filtrada2.jpg")#salva a nova imagem com nome diferente
    
-   img_pos_hist = exp_histograma(img2, largura, altura)
+   #img_pos_hist = exp_histograma(img2, largura, altura)
     
-   img_pos_hist.save("imagem_histograma2.jpg")#salva a nova imagem da expansao de histograma com nome diferente
+   #img_pos_hist.save("imagem_histograma2.jpg")#salva a nova imagem da expansao de histograma com nome diferente
 
+#TODO ERRO SE TODOS FOREM BRANCOS OU PRETOS
 def exp_histograma(imagem, largura, altura):
    pixels = imagem.load()
    high_R = 0              #valores iniciais
@@ -137,4 +137,4 @@ m, n, pivo, offset, passoP, matriz = ler_arquivo("entrada2.txt")
 # for linha in matriz:
 #    print(linha)
 
-aplicar_filtro("images.png", m, n, pivo, offset, passoP, matriz)
+aplicar_filtro("imbu.png", m, n, pivo, offset, passoP, matriz)
