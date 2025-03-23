@@ -1,27 +1,24 @@
-from PIL import Image
+from PIL import Image, ImageMath
+import numpy as np
+
 
 def converter_para_cinza(caminho_imagem):
-   # Carregar a imagem
+    # Carregar a imagem
    imagem = Image.open(caminho_imagem).convert("RGB")
 
-   # Método (a) - Banda G replicada
+    # Método (a) - Banda G replicada
    def grayscale_by_green(im):
       r, g, b = im.split()
       return Image.merge("RGB", (g, g, g))
 
-   # Método (b) - Banda Y do sistema YIQ
+    # Método (b) - Banda Y do sistema YIQ
    def grayscale_by_Y(im):
-      r, g, b = im.split()
-      r = r.convert("L")  # Converter para escala de cinza (8 bits)
-      g = g.convert("L")
-      b = b.convert("L")
-
-      # Calcular Y manualmente (pixel a pixel)
-      Y = Image.eval(r, lambda i: int(0.299 * i))
-      Y = Image.eval(g, lambda i: int(Y.getpixel((0, 0)) + 0.587 * i))
-      Y = Image.eval(b, lambda i: int(Y.getpixel((0, 0)) + 0.114 * i))
-
-      return Image.merge("RGB", (Y, Y, Y))
+      arr = np.array(im)  # Converte para array NumPy (H, W, 3)
+    
+      # Aplicando fórmula de luminância
+      Y = (0.299 * arr[:, :, 0] + 0.587 * arr[:, :, 1] + 0.114 * arr[:, :, 2]).astype(np.uint8)
+      # Criar uma imagem RGB com tons de cinza Y
+      return Image.fromarray(np.stack([Y, Y, Y], axis=-1))
 
    # Aplicar os métodos
    imagem_g = grayscale_by_green(imagem)
