@@ -32,12 +32,14 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
    img = Image.open(caminho) #carrega a imagem e recebe informações
    largura, altura = img.size
    pixels = img.load()
+   img2 = img.copy()
+   pixels2 = img2.load()
    
    pivo_x, pivo_y = pivo
    
    #fors para andar pela imagem
-   for y in range(pivo_y - 1, altura - pivo_y + 1): #calculo com o pivo para nao usar extensao por 0
-      for x in range(pivo_x - 1, largura - pivo_x + 1): #aka nao aplicar o filtro nas bordas da img
+   for y in range(pivo_y - 1, altura - m + pivo_y): #calculo com o pivo para nao usar extensao por 0
+      for x in range(pivo_x - 1, largura - n + pivo_x): #aka nao aplicar o filtro nas bordas da img
          red = 0
          green = 0
          blue = 0
@@ -47,19 +49,52 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
             for i in range(1, m+1):
                dist_altura = -pivo_x + i#distancia do pivo, pois o pixel atual e x e y
                dist_largura = -pivo_y + j#a distancia e baseada em x e y
-               r, g, b = pixels[x + dist_largura, y + dist_altura] #
+               r, g, b = pixels[x + dist_largura, y + dist_altura] # recebe os valores RGB do pixel
                red = red + (r * matriz[i-1][j-1])# valor_R_no_pixel_selecionado * valor da matriz de entrada
                green = green + (g * matriz[i-1][j-1])
                blue = blue + (b * matriz[i-1][j-1])
                matrix_sum = matrix_sum + matriz[i-1][j-1]# adicionar os valores da matriz conforme passa para dividr dps
-               
+         
          red = round(red/matrix_sum)#calcular o valor final das cores
          green = round(green/matrix_sum)#arredondar para virar int
          blue = round(blue/matrix_sum)
-         pixels[x, y] = (red, green, blue)#atribui o novo valor para o pixel atual
+         pixels2[x, y] = (red, green, blue)#atribui o novo valor para o pixel atual
          
-               
-   img.save("imagem_filtrada.jpg")#salva a nova imagem com nome diferente
+   img2.save("imagem_filtrada.jpg")#salva a nova imagem com nome diferente
+   
+   img_pos_hist = exp_histograma(img2, largura, altura)
+    
+   img_pos_hist.save("imagem_histograma.jpg")#salva a nova imagem da expansao de histograma com nome diferente
+
+def exp_histograma(imagem, largura, altura):
+   pixels = imagem.load()
+   high_R = 0              #valores iniciais
+   high_G = 0
+   high_B = 0
+   low_R = 255
+   low_G = 255
+   low_B = 255
+   
+   for y in range(altura): #analisar qual o menor valor de cada cor para o calculo a expansao
+      for x in range(largura):
+         r, g, b = pixels[x, y]
+         if(r < low_R): low_R = r
+         if(g < low_G): low_G = g
+         if(b < low_B): low_B = b
+         if(r > high_R): high_R = r
+         if(g > high_G): high_G = g
+         if(b > high_B): high_B = b
+
+
+   for y in range(altura): # passa de pixel em pixel usando os valores adquiridos
+      for x in range(largura):
+         r, g, b = pixels[x, y]
+         new_R = round((r - low_R) / (high_R - low_R) * 255) #o calculo do histograma e ja atribui o novo valor
+         new_G = round((g - low_G) / (high_G - low_G) * 255)
+         new_B = round((b - low_B) / (high_B - low_B) * 255)
+         pixels[x, y] = (new_R, new_G, new_B) #atribui o novo valor para o pixel atual
+   
+   return imagem
 
 # Exemplo de uso:
 m, n, pivo, matriz = ler_arquivo("entrada.txt")
