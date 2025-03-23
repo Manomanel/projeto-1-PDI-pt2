@@ -19,8 +19,8 @@ def converter_para_cinza(caminho_imagem):
 
         # Calcular Y manualmente (pixel a pixel)
         Y = Image.eval(r, lambda i: int(0.299 * i))
-        Y = Image.eval(g, lambda i: int(Y.getpixel((0, 0)) + 0.587 * i))
-        Y = Image.eval(b, lambda i: int(Y.getpixel((0, 0)) + 0.114 * i))
+        Y = Image.eval(g, lambda i: int(0.587 * i))
+        Y = Image.eval(b, lambda i: int(0.114 * i))
 
         return Image.merge("RGB", (Y, Y, Y))
 
