@@ -65,12 +65,13 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
          
    img2.save("imagem_filtrada.jpg")#salva a nova imagem com nome diferente
    
-   #img_pos_hist = exp_histograma(img2, largura, altura)
+   #img_pos_hist = exp_histograma(img2)
     
    #img_pos_hist.save("imagem_histograma.jpg")#salva a nova imagem da expansao de histograma com nome diferente
 
-def exp_histograma(imagem, largura, altura):
+def exp_histograma(imagem):
    pixels = imagem.load()
+   largura, altura = imagem.size
    high_R = 0              #valores iniciais
    high_G = 0
    high_B = 0
