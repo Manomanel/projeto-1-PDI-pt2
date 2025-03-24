@@ -31,11 +31,14 @@ def ler_arquivo(caminho):
 def aplicar_filtro(caminho, m, n, pivo, matriz):
    img = Image.open(caminho) #carrega a imagem e recebe informações
    largura, altura = img.size
-   pixels = img.load()
-   img2 = img.copy()
-   pixels2 = img2.load()
-   
    pivo_x, pivo_y = pivo
+   
+   pixels = img.load()
+   #img2 = img.copy()
+   nova_largura = largura - (pivo_y - 1) - (m - pivo_y)
+   nova_altura = altura - (pivo_x - 1) - (n - pivo_x)
+   img2 = Image.new("RGB", (nova_largura, nova_altura), (0, 0, 0))
+   pixels2 = img2.load()
    
    #fors para andar pela imagem
    for y in range(pivo_y - 1, altura - m + pivo_y): #calculo com o pivo para nao usar extensao por 0
@@ -58,13 +61,13 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
          red = round(red/matrix_sum)#calcular o valor final das cores
          green = round(green/matrix_sum)#arredondar para virar int
          blue = round(blue/matrix_sum)
-         pixels2[x, y] = (red, green, blue)#atribui o novo valor para o pixel atual
+         pixels2[x - (pivo_x - 1), y - (pivo_y - 1)] = (red, green, blue)#atribui o novo valor para o pixel atual
          
    img2.save("imagem_filtrada.jpg")#salva a nova imagem com nome diferente
    
-   img_pos_hist = exp_histograma(img2, largura, altura)
+   #img_pos_hist = exp_histograma(img2, largura, altura)
     
-   img_pos_hist.save("imagem_histograma.jpg")#salva a nova imagem da expansao de histograma com nome diferente
+   #img_pos_hist.save("imagem_histograma.jpg")#salva a nova imagem da expansao de histograma com nome diferente
 
 def exp_histograma(imagem, largura, altura):
    pixels = imagem.load()
@@ -104,5 +107,5 @@ m, n, pivo, matriz = ler_arquivo("entrada.txt")
 # for linha in matriz:
 #    print(linha)
 
-largura, altura = aplicar_filtro("imbu.png", m, n, pivo, matriz)
+aplicar_filtro("imbu.png", m, n, pivo, matriz)
 

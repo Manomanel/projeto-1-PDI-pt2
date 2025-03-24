@@ -37,11 +37,13 @@ def ler_arquivo(caminho):
 def aplicar_filtro(caminho, m, n, pivo, offset, passoP, matriz):
    img = Image.open(caminho) #carrega a imagem e recebe informações
    largura, altura = img.size
-   pixels = img.load()
-   img2 = img.copy()
-   pixels2 = img2.load()
-   
    pivo_x, pivo_y = pivo
+   nova_largura = largura - (pivo_y - 1) - (m - pivo_y)
+   nova_altura = altura - (pivo_x - 1) - (n - pivo_x)
+   
+   pixels = img.load()
+   img2 = Image.new("RGB", (nova_largura, nova_altura), (0, 0, 0))
+   pixels2 = img2.load()
    
    count_x = -1 #count para o passo P
    count_y = -1 
@@ -89,7 +91,7 @@ def aplicar_filtro(caminho, m, n, pivo, offset, passoP, matriz):
          if(green < 0): green = 0
          if(blue < 0): blue = 0
          
-         pixels2[x, y] = (red, green, blue)#atribui o novo valor para o pixel atual
+         pixels2[x - (pivo_x - 1), y - (pivo_y - 1)] = (red, green, blue)#atribui o novo valor para o pixel atual
          
    img2.save("imagem_filtrada2.jpg")#salva a nova imagem com nome diferente
    

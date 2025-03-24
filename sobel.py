@@ -40,8 +40,6 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
    img2 = Image.new("RGB", (nova_largura, nova_altura), (0, 0, 0))
    pixels2 = img2.load()
    
-
-   
    #fors para andar pela imagem
    for y in range(pivo_y - 1, altura - m + pivo_y): #calculo com o pivo para nao usar extensao por 0
       for x in range(pivo_x - 1, largura - n + pivo_x): #aka nao aplicar o filtro nas bordas da img
@@ -70,7 +68,7 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
          blue = abs(blue)
          
          pixels2[x - (pivo_x - 1), y - (pivo_y - 1)] = (red, green, blue)#atribui o novo valor para o pixel atual
-         
+   
    img2.save("imagem_filtrada.jpg")#salva a nova imagem com nome diferente
    
    #img_pos_hist = exp_histograma(img2, largura, altura)
@@ -115,7 +113,7 @@ m, n, pivo, matriz = ler_arquivo("entradaSobel.txt")
 # for linha in matriz:
 #    print(linha)
 
-getcontext().prec = 50  # Aumenta a precisão
+getcontext().prec = 40  # Aumenta a precisão
 
 aplicar_filtro("Shapes.png", m, n, pivo, matriz)
 
