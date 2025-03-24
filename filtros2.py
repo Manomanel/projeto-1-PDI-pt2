@@ -95,12 +95,13 @@ def aplicar_filtro(caminho, m, n, pivo, offset, passoP, matriz):
          
    img2.save("imagem_filtrada2.jpg")#salva a nova imagem com nome diferente
    
-   #img_pos_hist = exp_histograma(img2, largura, altura)
+   img_pos_hist = exp_histograma(img2)
     
-   #img_pos_hist.save("imagem_histograma2.jpg")#salva a nova imagem da expansao de histograma com nome diferente
+   img_pos_hist.save("imagem_histograma2.jpg")#salva a nova imagem da expansao de histograma com nome diferente
 
 #TODO ERRO SE TODOS FOREM BRANCOS OU PRETOS
-def exp_histograma(imagem, largura, altura):
+def exp_histograma(imagem):
+   largura, altura = imagem.size
    pixels = imagem.load()
    high_R = 0              #valores iniciais
    high_G = 0
@@ -119,6 +120,7 @@ def exp_histograma(imagem, largura, altura):
          if(g > high_G): high_G = g
          if(b > high_B): high_B = b
 
+   if(high_R - low_R == 0| high_G - low_G == 0| high_B - low_B == 0): exit() #evitar divisao por 0 quando a imagem inteira tem o mesmo valor de uma cor
 
    for y in range(altura): # passa de pixel em pixel usando os valores adquiridos
       for x in range(largura):

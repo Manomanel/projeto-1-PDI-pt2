@@ -88,6 +88,7 @@ def exp_histograma(imagem, largura, altura):
          if(g > high_G): high_G = g
          if(b > high_B): high_B = b
 
+   if(high_R - low_R == 0| high_G - low_G == 0| high_B - low_B == 0): exit() #evitar divisao por 0 quando a imagem inteira tem o mesmo valor de uma cor
 
    for y in range(altura): # passa de pixel em pixel usando os valores adquiridos
       for x in range(largura):
