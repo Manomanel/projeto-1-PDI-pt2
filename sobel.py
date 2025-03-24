@@ -31,13 +31,16 @@ def ler_arquivo(caminho):
 def aplicar_filtro(caminho, m, n, pivo, matriz):
    img = Image.open(caminho) #carrega a imagem e recebe informações
    largura, altura = img.size
-   pixels = img.load()
-   img2 = img.copy()
-   pixels2 = img2.load()
-   
    pivo_x, pivo_y = pivo
    matrix_size = m * n
-   count = 0
+   nova_largura = largura - (pivo_y - 1) - (m - pivo_y)
+   nova_altura = altura - (pivo_x - 1) - (n - pivo_x)
+   
+   pixels = img.load()
+   img2 = Image.new("RGB", (nova_largura, nova_altura), (0, 0, 0))
+   pixels2 = img2.load()
+   
+
    
    #fors para andar pela imagem
    for y in range(pivo_y - 1, altura - m + pivo_y): #calculo com o pivo para nao usar extensao por 0
@@ -51,7 +54,7 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
             for i in range(1, m+1):
                dist_altura = -pivo_x + i#distancia do pivo, pois o pixel atual e x e y
                dist_largura = -pivo_y + j#a distancia e baseada em x e y
-               r, g, b = pixels[x + dist_largura - 1, y + dist_altura] # recebe os valores RGB do pixel
+               r, g, b = pixels[x + dist_largura, y + dist_altura] # recebe os valores RGB do pixel
                red = red + Decimal(r * matriz[i-1][j-1] / matrix_size)# valor_R_no_pixel_selecionado * valor da matriz de entrada
                green = green + Decimal(g * matriz[i-1][j-1] / matrix_size)
                blue = blue + Decimal(b * matriz[i-1][j-1] / matrix_size)
@@ -60,7 +63,13 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
          red = round(red)#calcular o valor final das cores
          green = round(green)#arredondar para virar int
          blue = round(blue)
-         pixels2[x, y] = (red, green, blue)#atribui o novo valor para o pixel atual
+         
+         #Modularizacao
+         red = abs(red)
+         green = abs(green)
+         blue = abs(blue)
+         
+         pixels2[x - (pivo_x - 1), y - (pivo_y - 1)] = (red, green, blue)#atribui o novo valor para o pixel atual
          
    img2.save("imagem_filtrada.jpg")#salva a nova imagem com nome diferente
    
@@ -99,7 +108,7 @@ def exp_histograma(imagem, largura, altura):
    return imagem
 
 # Exemplo de uso:
-m, n, pivo, matriz = ler_arquivo("entrada.txt")
+m, n, pivo, matriz = ler_arquivo("entradaSobel.txt")
 # print("Dimensões:", m, "x", n)
 # print("Pivô em:", pivo)
 # print("Matriz:")
@@ -108,5 +117,5 @@ m, n, pivo, matriz = ler_arquivo("entrada.txt")
 
 getcontext().prec = 50  # Aumenta a precisão
 
-aplicar_filtro("choboco.jpg", m, n, pivo, matriz)
+aplicar_filtro("Shapes.png", m, n, pivo, matriz)
 
