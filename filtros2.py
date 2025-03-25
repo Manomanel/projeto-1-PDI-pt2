@@ -38,8 +38,8 @@ def aplicar_filtro(caminho, m, n, pivo, offset, passoP, matriz):
    img = Image.open(caminho) #carrega a imagem e recebe informações
    largura, altura = img.size
    pivo_x, pivo_y = pivo
-   nova_largura = largura - (pivo_y - 1) - (m - pivo_y)
-   nova_altura = altura - (pivo_x - 1) - (n - pivo_x)
+   nova_altura = altura - (pivo_y - 1) - (m - pivo_y) #altura e largura da nova imagem, para tirar as bordas que nao vao receber o filtro
+   nova_largura = largura - (pivo_x - 1) - (n - pivo_x)
    
    pixels = img.load()
    img2 = Image.new("RGB", (nova_largura, nova_altura), (0, 0, 0))
@@ -51,11 +51,15 @@ def aplicar_filtro(caminho, m, n, pivo, offset, passoP, matriz):
    #fors para andar pela imagem
    for y in range(pivo_y - 1, altura - m + pivo_y): #calculo com o pivo para nao usar extensao por 0
       count_y += 1
-      if (count_y % passoP != 0): continue #passo P
+      if (count_y % passoP != 0): ##decidir se o pixel esta incluso no passo P ou nao 
+         pixels2[x - (pivo_x - 1), y - (pivo_y - 1)] = (0, 0, 0)#pixel pulado pelo passo p vira cor preta
+         continue
       
       for x in range(pivo_x - 1, largura - n + pivo_x): #aka nao aplicar o filtro nas bordas da img
          count_x += 1
-         if (count_x % passoP != 0): continue #decidir se o pixel esta incluso no passo P ou nao 
+         if (count_x % passoP != 0): 
+            pixels2[x - (pivo_x - 1), y - (pivo_y - 1)] = (0, 0, 0)
+            continue 
          
          red = 0
          green = 0
@@ -93,11 +97,11 @@ def aplicar_filtro(caminho, m, n, pivo, offset, passoP, matriz):
          
          pixels2[x - (pivo_x - 1), y - (pivo_y - 1)] = (red, green, blue)#atribui o novo valor para o pixel atual
          
-   img2.save("imagem_filtrada2.jpg")#salva a nova imagem com nome diferente
+   img2.save("imagem_filtrada2.tif")#salva a nova imagem com nome diferente
    
    img_pos_hist = exp_histograma(img2)
     
-   img_pos_hist.save("imagem_histograma2.jpg")#salva a nova imagem da expansao de histograma com nome diferente
+   img_pos_hist.save("imagem_histograma2.tif")#salva a nova imagem da expansao de histograma com nome diferente
 
 #TODO ERRO SE TODOS FOREM BRANCOS OU PRETOS
 def exp_histograma(imagem):
@@ -141,4 +145,4 @@ m, n, pivo, offset, passoP, matriz = ler_arquivo("entrada2.txt")
 # for linha in matriz:
 #    print(linha)
 
-aplicar_filtro("imbu.png", m, n, pivo, offset, passoP, matriz)
+aplicar_filtro("testePROF.tif", m, n, pivo, offset, passoP, matriz)

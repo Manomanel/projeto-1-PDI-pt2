@@ -32,37 +32,38 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
    img = Image.open(caminho) #carrega a imagem e recebe informações
    largura, altura = img.size
    pivo_x, pivo_y = pivo
-   matrix_size = m * n
-   nova_largura = largura - (pivo_y - 1) - (m - pivo_y)
-   nova_altura = altura - (pivo_x - 1) - (n - pivo_x)
-   
+   nova_altura = altura - (pivo_y - 1) - (m - pivo_y) #altura e largura da nova imagem, para tirar as bordas que nao vao receber o filtro
+   nova_largura = largura - (pivo_x - 1) - (n - pivo_x)
+   matrix_sum = 0
+   for j in range(1,n+1): #calcular o total do peso da mascara para usar depois
+      for i in range(1, m+1):
+         matrix_sum = matrix_sum + abs(matriz[i-1][j-1])
+
    pixels = img.load()
-   img2 = Image.new("RGB", (nova_largura, nova_altura), (0, 0, 0))
+   img2 = Image.new("RGB", (nova_largura, nova_altura), (0, 0, 0)) #cria a imagem que sera a saida do programa
    pixels2 = img2.load()
    
    #fors para andar pela imagem
    for y in range(pivo_y - 1, altura - m + pivo_y): #calculo com o pivo para nao usar extensao por 0
-      for x in range(pivo_x - 1, largura - n + pivo_x): #aka nao aplicar o filtro nas bordas da img
-         red = Decimal(0)
+      for x in range(pivo_x - 1, largura - n + pivo_x): #basicamente nao passar nas bordas da img de acordo com a mascara
+         red = Decimal(0) #decimal para nao ter erro de ponto flutuante
          green = Decimal(0)
          blue = Decimal(0)
-         matrix_sum = 0 # num filtro gaussiano, este valor será 1 pois quem vai ser dividido são os valores individuais
-                        # caso seja um filtro com pesos inteiros no final vai dividir pela soma desses pesos
-         for j in range(1, n+1):#altura e largura da matriz para percorrer
+
+         for j in range(1, n+1):#altura e largura da matriz para percorrer nos pixels "vizinhos"
             for i in range(1, m+1):
                dist_altura = -pivo_x + i#distancia do pivo, pois o pixel atual e x e y
-               dist_largura = -pivo_y + j#a distancia e baseada em x e y
+               dist_largura = -pivo_y + j#a distancia e baseada no tamanho da matrix e onde esta o pivo
                r, g, b = pixels[x + dist_largura, y + dist_altura] # recebe os valores RGB do pixel
-               red = red + Decimal(r * matriz[i-1][j-1] / matrix_size)# valor_R_no_pixel_selecionado * valor da matriz de entrada
-               green = green + Decimal(g * matriz[i-1][j-1] / matrix_size)
-               blue = blue + Decimal(b * matriz[i-1][j-1] / matrix_size)
-               matrix_sum = matrix_sum + matriz[i-1][j-1]# adicionar os valores da matriz conforme passa para dividr dps
+               red = red + Decimal(r * matriz[i-1][j-1] / matrix_sum)# valor_R_no_pixel_selecionado * valor da matriz de entrada
+               green = green + Decimal(g * matriz[i-1][j-1] / matrix_sum)
+               blue = blue + Decimal(b * matriz[i-1][j-1] / matrix_sum)
          
          red = round(red)#calcular o valor final das cores
          green = round(green)#arredondar para virar int
          blue = round(blue)
          
-         #Modularizacao
+         #Modularizacao para sobel
          red = abs(red)
          green = abs(green)
          blue = abs(blue)
@@ -115,7 +116,7 @@ m, n, pivo, matriz = ler_arquivo("entradaSobel.txt")
 # for linha in matriz:
 #    print(linha)
 
-getcontext().prec = 40  # Aumenta a precisão
+getcontext().prec = 20  # Aumenta a precisão
 
-aplicar_filtro("Shapes.png", m, n, pivo, matriz)
+aplicar_filtro("testePROF.tif", m, n, pivo, matriz)
 

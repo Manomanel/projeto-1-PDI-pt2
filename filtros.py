@@ -35,8 +35,8 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
    
    pixels = img.load()
    #img2 = img.copy()
-   nova_largura = largura - (pivo_y - 1) - (m - pivo_y)
-   nova_altura = altura - (pivo_x - 1) - (n - pivo_x)
+   nova_altura = altura - (pivo_y - 1) - (m - pivo_y) #altura e largura da nova imagem, para tirar as bordas que nao vao receber o filtro
+   nova_largura = largura - (pivo_x - 1) - (n - pivo_x)
    img2 = Image.new("RGB", (nova_largura, nova_altura), (0, 0, 0))
    pixels2 = img2.load()
    
@@ -65,13 +65,13 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
          
    img2.save("imagem_filtrada.jpg")#salva a nova imagem com nome diferente
    
-   #img_pos_hist = exp_histograma(img2)
+   #img_pos_hist = exp_histograma(img2, largura, altura)
     
    #img_pos_hist.save("imagem_histograma.jpg")#salva a nova imagem da expansao de histograma com nome diferente
 
 def exp_histograma(imagem):
    pixels = imagem.load()
-   largura, altura = imagem.size
+   largura, altura = imagem
    high_R = 0              #valores iniciais
    high_G = 0
    high_B = 0
