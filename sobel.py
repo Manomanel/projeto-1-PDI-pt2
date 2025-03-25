@@ -59,14 +59,14 @@ def aplicar_filtro(caminho, m, n, pivo, matriz):
                green = green + Decimal(g * matriz[i-1][j-1] / matrix_sum)
                blue = blue + Decimal(b * matriz[i-1][j-1] / matrix_sum)
          
-         red = round(red)#calcular o valor final das cores
-         green = round(green)#arredondar para virar int
+         red = round(red)#arredondar para virar int
+         green = round(green)
          blue = round(blue)
          
          #Modularizacao para sobel
-         red = abs(red)
-         green = abs(green)
-         blue = abs(blue)
+         #red = abs(red)
+         #green = abs(green)
+         #blue = abs(blue)
          
          pixels2[x - (pivo_x - 1), y - (pivo_y - 1)] = (red, green, blue)#atribui o novo valor para o pixel atual
    

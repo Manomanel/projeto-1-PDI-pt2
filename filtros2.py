@@ -1,11 +1,11 @@
 from PIL import Image
+from decimal import Decimal, getcontext
 
 #LEITOR DE ARQUIVOS
 #int int (largura altura da matriz)
 #int int (o lugar em que um pivo será)
 #int (offset)
 #int (passo P)
-#int (Relu)
 #float float float (matriz)
 #float float float
 #float float float
@@ -40,6 +40,10 @@ def aplicar_filtro(caminho, m, n, pivo, offset, passoP, matriz):
    pivo_x, pivo_y = pivo
    nova_altura = altura - (pivo_y - 1) - (m - pivo_y) #altura e largura da nova imagem, para tirar as bordas que nao vao receber o filtro
    nova_largura = largura - (pivo_x - 1) - (n - pivo_x)
+   matrix_sum = 0
+   for j in range(1,n+1): #calcular o total do peso da mascara para usar depois
+      for i in range(1, m+1):
+         matrix_sum = matrix_sum + abs(matriz[i-1][j-1])
    
    pixels = img.load()
    img2 = Image.new("RGB", (nova_largura, nova_altura), (0, 0, 0))
@@ -61,24 +65,22 @@ def aplicar_filtro(caminho, m, n, pivo, offset, passoP, matriz):
             pixels2[x - (pivo_x - 1), y - (pivo_y - 1)] = (0, 0, 0)
             continue 
          
-         red = 0
-         green = 0
-         blue = 0
-         matrix_sum = 0 # num filtro gaussiano, este valor será 1 pois quem vai ser dividido são os valores individuais
-                        # caso seja um filtro com pesos inteiros no final vai dividir pela soma desses pesos
+         red = Decimal(0) #decimal para nao ter erro de ponto flutuante
+         green = Decimal(0)
+         blue = Decimal(0)
+
          for j in range(1, n+1):#altura e largura da matriz para percorrer
             for i in range(1, m+1):
                dist_altura = -pivo_x + i#distancia do pivo, pois o pixel atual e x e y
                dist_largura = -pivo_y + j#a distancia e baseada em x e y
                r, g, b = pixels[x + dist_largura, y + dist_altura] #
-               red = red + (r * matriz[i-1][j-1])# valor_R_no_pixel_selecionado * valor da matriz de entrada
-               green = green + (g * matriz[i-1][j-1])
-               blue = blue + (b * matriz[i-1][j-1])
-               matrix_sum = matrix_sum + matriz[i-1][j-1]# adicionar os valores da matriz conforme passa para dividr dps
+               red = red + Decimal(r * matriz[i-1][j-1]/matrix_sum)# valor_R_no_pixel_selecionado * valor da matriz de entrada
+               green = green + Decimal(g * matriz[i-1][j-1]/matrix_sum)
+               blue = blue + Decimal(b * matriz[i-1][j-1]/matrix_sum)
                
-         red = round(red/matrix_sum)#calcular o valor final das cores
-         green = round(green/matrix_sum)#arredondar para virar int
-         blue = round(blue/matrix_sum)
+         red = round(red)#arredondar para virar int
+         green = round(green)
+         blue = round(blue)
          
          #Calcular offset
          red = red + offset
@@ -89,6 +91,11 @@ def aplicar_filtro(caminho, m, n, pivo, offset, passoP, matriz):
          if(red > 255): red = 255
          if(green > 255): green = 255
          if(blue > 255): blue = 255
+
+         #Modularizacao para sobel
+         #red = abs(red)
+         #green = abs(green)
+         #blue = abs(blue)
          
          #funcao ReLU
          if(red < 0): red = 0
@@ -103,7 +110,6 @@ def aplicar_filtro(caminho, m, n, pivo, offset, passoP, matriz):
     
    img_pos_hist.save("imagem_histograma2.tif")#salva a nova imagem da expansao de histograma com nome diferente
 
-#TODO ERRO SE TODOS FOREM BRANCOS OU PRETOS
 def exp_histograma(imagem):
    largura, altura = imagem.size
    pixels = imagem.load()
@@ -144,5 +150,7 @@ m, n, pivo, offset, passoP, matriz = ler_arquivo("entrada2.txt")
 # print("Matriz:")
 # for linha in matriz:
 #    print(linha)
+
+getcontext().prec = 20  # Aumenta a precisão
 
 aplicar_filtro("testePROF.tif", m, n, pivo, offset, passoP, matriz)
